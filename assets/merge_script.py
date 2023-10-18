@@ -29,7 +29,7 @@ def generate_inner_slider(slider_header, button_header, slider_id, slider_value_
         <p style='font-size: 12pt; text-align: center' class='slider-value-cl' id='slider-value-{slider_value_id}-id'></p>
         <input class='slider-cl' id='slider-{slider_id}-id' type='text' data-slider-min='0' data-slider-max='{slider_value_max}' data-slider-step='1' data-slider-value='{slider_value}'/>
         <div style='font-size: 12pt; text-align: center;'>
-            <button class='animate-button-cl' id='{button_id}' onclick='animateButtonClick(slider = {slider_id})'>{button_header}</button>
+            <button class='animate-button-cl' id='animate-button-{button_id}-id' onclick='animateButtonClick(slider = {slider_id})'>{button_header}</button>
         </div>
     """
     return tag
@@ -44,7 +44,7 @@ def generate_outer_slider(sliders):
             tag += "<br>" + generate_inner_slider(slider_header = sliders["slider_header"][ii], button_header = sliders["button_header"][ii], slider_id = str(ii+1), slider_value_id = str(ii+1), slider_value_max = sliders["slider_value_max"][ii], slider_value = sliders["slider_value"][ii], button_id = str(ii+1))
     return tag
 
-# function to generate tabs
+# function to generate tabs for more than just one figure
 def generate_tabs(figures):
     tag = ""
     # loop over figures
@@ -78,7 +78,7 @@ def generate_figures(figures):
             <img src="./figures/figure_0{ii+1}.svg" alt="" class="figure-cl" id="figure{ii+1}Id" style="max-width: 75%;">
             </div>                                        
             <p class="audio-show-text-cl" id="audio-show-text-figure-{ii+1}-id" style="font-size: 10pt; color: red; font-style: italic; text-align: center; display: none;"></p>
-            <em> tab-text-0{ii+1} </em>                  
+            <div><em> tab-text-0{ii+1} </em></div>
             </div>
         """
     return tag
@@ -126,13 +126,15 @@ for chunk in code_chunks:
         print(f"An error occurred while executing the code: {e}")
 
 # add tab tags
-html_content = html_content.replace(f"<!-- include-tabs -->", generate_tabs(figures = figures))
+if len(figures["tab_name"]) > 0:
+    html_content = html_content.replace(f"<!-- include-tabs -->", generate_tabs(figures = figures))
+
 # add figure tags
 html_content = html_content.replace(f"<!-- include-figures -->", generate_figures(figures = figures))
 # add slider tags
 html_content = html_content.replace(f"<!-- include-sliders -->", generate_outer_slider(sliders = sliders))
 # add audio tags
-html_content = html_content.replace(f"<!-- include-audio-text -->", generate_audio_text(n_figures=len(figures["tab_name"]), n_sliders=len(sliders["value"])))
+html_content = html_content.replace(f"<!-- include-audio-text -->", generate_audio_text(n_figures=len(figures["tab_header"]), n_sliders=len(sliders["value"])))
 
 # transform python to javascript and insert
 chunk = "code-01"
